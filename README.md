@@ -29,6 +29,9 @@ bs = BillSnap('House', 183, 113)
 For a given bill, BillSnap can tell you things like:
 * title (`bs.get_title()`)
 * summary (`bs.get_summary()`)
+* policy area(s) (`bs.get_policy_areas()`)
+* full text (`bs.get_text()`)
+* sponsor (`bs.get_sponsor()`)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
