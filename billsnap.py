@@ -127,8 +127,6 @@ class BillSnap():
         Gets the bill's corresponding policy area term(s). Returns a list of
         policy terms.
 
-        **TODO**: identify if a bill can have more than one policy term.
-
         Example usage:
             >>> bs = BillSnap('house', 183, 113)
             >>> print(bs.get_policy_areas())
@@ -172,7 +170,7 @@ class BillSnap():
                 requests.get(url_policy).content, 'html.parser'
             )
 
-        policy_areas = []
+        policy_areas = [] #TODO: identify if a bill can have more than one policy term.
         for link in page_content.find_all('li'):
             if any(policy==link.text for policy in policy_vocab):
                 policy_areas.append(link.text)
@@ -197,8 +195,6 @@ class BillSnap():
         Gets full text of a bill. Format is readable, but not guaranteed to
         be pretty.
 
-        *TODO** consider earhing the TXT or PDF if no XML/HTML is available
-
         Returns
             Full bill text, if available. Returns None if there is no XML/HTML
             link available.
@@ -214,5 +210,23 @@ class BillSnap():
                 ]):
                 bill_text += item.text.replace('\n\t\t\t', '')
             return bill_text
-        #**TODO** consider earhing the TXT or PDF if no XML/HTML is available
+        #TODO: consider earhing the TXT or PDF if no XML/HTML is available
         return None
+
+    def get_sponsor(self) -> str:
+        '''
+        Gets the name of a bill's sponsor.
+
+        Example usage:
+            >>> bs = BillSnap('house', 183, 113)
+            >>> print(bs.get_sponsor())
+            Rep. Grimm, Michael G. [R-NY-11]
+        '''
+        page_content = BeautifulSoup(
+                requests.get(self.url).content, 'html.parser'
+            )
+
+        for link in page_content.find_all('a', href=True):
+            if '/member/' in link['href'] or \
+                    'Sen.' in link.text or 'Rep.' in link.text:
+                return link.text
