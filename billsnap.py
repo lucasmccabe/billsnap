@@ -84,19 +84,18 @@ class BillSnap():
 
         for line in page_content.find_all('h1'):
             if 'legDetail' in str(line):
-                break
+                line = line.text
+                congress_label = re.findall(str(self.congress)+'\w+ Congress', line)[0]
 
-        line = line.text
-        congress_label = re.findall(str(self.congress)+'\w+ Congress', line)[0]
+                if self.chamber == 'house':
+                    chamber_label = 'H.R.%s' %str(self.bill)
+                if self.chamber == 'senate':
+                    chamber_label = 'S.%s' %str(self.bill)
 
-        if self.chamber == 'house':
-            chamber_label = 'H.R.%s' %str(self.bill)
-        if self.chamber == 'senate':
-            chamber_label = 'S.%s' %str(self.bill)
+                title = line[len(chamber_label)+3:line.index(congress_label)]
 
-        title = line[len(chamber_label)+3:line.index(congress_label)]
-
-        return title
+                return title
+        return None
 
     def get_summary(self) -> str:
         '''
@@ -113,4 +112,4 @@ class BillSnap():
             if 'summary' in paras[i].text:
                 return paras[i+1].text
 
-        return [p.text for p in paras]
+        return None
