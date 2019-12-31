@@ -54,7 +54,6 @@ class BillSnap():
                     self.chamber,
                     str(self.bill)
                 )
-
         return url
 
     def bill_exists(self) -> bool:
@@ -69,7 +68,6 @@ class BillSnap():
         for header in page_content.find_all('h1'):
             if 'page not found' in header.text.lower():
                 return False
-
         return True
 
     def get_title(self) -> str:
@@ -81,7 +79,6 @@ class BillSnap():
             >>> print(bs.get_title())
             Veterans Dog Training Therapy Act
         '''
-
         page_content = BeautifulSoup(
                 requests.get(self.url).content, 'html.parser'
             )
@@ -99,7 +96,6 @@ class BillSnap():
                 title = line[len(chamber_label)+3:line.index(congress_label)]
 
                 return title
-
         return None
 
     def get_summary(self) -> str:
@@ -124,15 +120,19 @@ class BillSnap():
         for i in range(len(paras)):
             if 'summary' in paras[i].text:
                 return paras[i+1].text
-
         return None
 
     def get_policy_areas(self) -> List:
         '''
-        Get the bill's corresponding policy area term(s).
+        Gets the bill's corresponding policy area term(s). Returns a list of
+        policy terms.
+
+        **TODO**: identify if a bill can have more than one policy term.
 
         Example usage:
-            TODO
+            >>> bs = BillSnap('house', 183, 113)
+            >>> print(bs.get_policy_areas())
+            ['Armed Forces and National Security']
         '''
         policy_vocab = ['Agriculture and Food',
                         'Animals',
@@ -176,5 +176,43 @@ class BillSnap():
         for link in page_content.find_all('li'):
             if any(policy==link.text for policy in policy_vocab):
                 policy_areas.append(link.text)
-
         return policy_areas
+
+    def get_text_url(self) -> str:
+        '''
+        Gets url for congress.gov link to full bill text.
+        '''
+        url_text = self.url + '/text'
+        page_content = BeautifulSoup(
+                requests.get(url_text).content, 'html.parser'
+            )
+
+        for link in page_content.find_all(href=True):
+            if 'XML/HTML (new window)' in link.text:
+                return 'https://www.congress.gov' + link['href']
+        return None
+
+    def get_text(self) -> str:
+        '''
+        Gets full text of a bill. Format is readable, but not guaranteed to
+        be pretty.
+
+        *TODO** consider earhing the TXT or PDF if no XML/HTML is available
+
+        Returns
+            Full bill text, if available. Returns None if there is no XML/HTML
+            link available.
+        '''
+        if self.get_text_url():
+            page_content = BeautifulSoup(
+                    requests.get(self.get_text_url()).content, 'html.parser'
+                )
+
+            bill_text = ''
+            for item in page_content.find_all([
+                'section', 'subsection', 'paragraph', 'subparagraph'
+                ]):
+                bill_text += item.text.replace('\n\t\t\t', '')
+            return bill_text
+        #**TODO** consider earhing the TXT or PDF if no XML/HTML is available
+        return None
