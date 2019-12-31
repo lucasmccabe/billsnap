@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+from typing import List
 
 
 class BillSnap():
@@ -18,6 +19,7 @@ class BillSnap():
         Raises:
             AttributeError: if chamber is invalid
             LookupError: if url does not correspond to an existing bill
+            LookupError: if summary cannot be found on congress.gov page
 
         Example Usage:
             >>> bs = BillSnap('house', 183, 113)
@@ -40,9 +42,6 @@ class BillSnap():
 
         if not self.bill_exists():
             raise LookupError('Bill not found.')
-
-        self.title = self.get_title()
-        self.summary = self.get_summary()
 
 
     def generate_url(self) -> str:
@@ -76,6 +75,11 @@ class BillSnap():
     def get_title(self) -> str:
         '''
         Gets bill title from congress.gov page.
+
+        Example usage:
+            >>> bs = BillSnap('house', 183, 113)
+            >>> print(bs.get_title())
+            Veterans Dog Training Therapy Act
         '''
 
         page_content = BeautifulSoup(
@@ -95,11 +99,20 @@ class BillSnap():
                 title = line[len(chamber_label)+3:line.index(congress_label)]
 
                 return title
+
         return None
 
     def get_summary(self) -> str:
         '''
         Gets bill summary from congress.gov page.
+
+        Example usage:
+            >>> bs = BillSnap('house', 183, 113)
+            >>> print(b.get_summary())
+            Veterans Dog Training Therapy Act - Directs the Secretary of
+            Veterans Affairs to carry out a pilot program for assessing the
+            effectiveness of addressing post-deployment mental health and
+            post-traumatic stress disorder symptoms [...]
         '''
         url_summary = self.url + '/summary'
         page_content = BeautifulSoup(
@@ -113,3 +126,55 @@ class BillSnap():
                 return paras[i+1].text
 
         return None
+
+    def get_policy_areas(self) -> List:
+        '''
+        Get the bill's corresponding policy area term(s).
+
+        Example usage:
+            TODO
+        '''
+        policy_vocab = ['Agriculture and Food',
+                        'Animals',
+                        'Armed Forces and National Security',
+                        'Arts, Culture, Religion',
+                        'Civil Rights and Liberties, Minority Issues',
+                        'Commerce',
+                        'Congress',
+                        'Crime and Law Enforcement',
+                        'Economics and Public Finance',
+                        'Education',
+                        'Emergency Management',
+                        'Energy',
+                        'Environmental Protection',
+                        'Families',
+                        'Finance and Financial Sector',
+                        'Foreign Trade and International Finance',
+                        'Government Operations and Politics',
+                        'Health',
+                        'Housing and Community Development',
+                        'Immigration',
+                        'International Affairs',
+                        'Labor and Employment',
+                        'Law',
+                        'Native Americans',
+                        'Public Lands and Natural Resources',
+                        'Science, Technology, Communications',
+                        'Social Sciences and History',
+                        'Social Welfare',
+                        'Sports and Recreation',
+                        'Taxation',
+                        'Transportation and Public Works',
+                        'Water Resources Development']
+
+        url_policy = self.url + '/subjects'
+        page_content = BeautifulSoup(
+                requests.get(url_policy).content, 'html.parser'
+            )
+
+        policy_areas = []
+        for link in page_content.find_all('li'):
+            if any(policy==link.text for policy in policy_vocab):
+                policy_areas.append(link.text)
+
+        return policy_areas

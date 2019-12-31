@@ -26,9 +26,9 @@ Initialize a BillSnap object with:
 bs = BillSnap('House', 183, 113)
 ```
 
-Your BillSnap object can tell you things like:
-* bill title (`bs.title`)
-* bill summary (`bs.summary`)
+For a given bill, BillSnap can tell you things like:
+* title (`bs.get_title()`)
+* summary (`bs.get_summary()`)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
