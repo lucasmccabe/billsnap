@@ -174,7 +174,10 @@ class BillSnap():
         for link in page_content.find_all('li'):
             if any(policy==link.text for policy in policy_vocab):
                 policy_areas.append(link.text)
-        return policy_areas
+        if policy_areas:
+            return policy_areas
+        else:
+            return [None]
 
     def get_text_url(self) -> str:
         '''
@@ -230,3 +233,25 @@ class BillSnap():
             if '/member/' in link['href'] or \
                     'Sen.' in link.text or 'Rep.' in link.text:
                 return link.text
+        return None
+
+    def get_cosponsors(self) -> List:
+        '''
+        Gets the names of a bill's cosponsors (does not include the sponsor).
+        '''
+        cosponsors_url = self.url + '/cosponsors'
+        page_content = BeautifulSoup(
+                requests.get(cosponsors_url).content, 'html.parser'
+            )
+
+        sponsor = self.get_sponsor()
+        cosponsors = []
+        for link in page_content.find_all('a', href=True):
+            if ('/member/' in link['href'] or \
+                    'Sen.' in link.text or 'Rep.' in link.text) and \
+                    link.text != sponsor:
+                cosponsors.append(link.text)
+        if cosponsors:
+            return cosponsors
+        else:
+            return [None]
