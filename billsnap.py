@@ -4,8 +4,8 @@ import re
 from typing import List
 
 
-class BillSnap():
-    '''BillSnap is an easier way to get US legislative data.'''
+class SnapScrape():
+    '''Scrapes US legislative data. Is very handsome.'''
 
     def __init__(self, chamber:str, bill:int, congress:int = 115):
         '''
@@ -22,9 +22,7 @@ class BillSnap():
             LookupError: if summary cannot be found on congress.gov page
 
         Example Usage:
-            >>> bs = BillSnap('house', 183, 113)
-            >>> print(bs.title)
-            Veterans Dog Training Therapy Act
+            >>> bill = SnapScrape('house', 183, 113)
         '''
 
         self.congress = congress
@@ -75,8 +73,8 @@ class BillSnap():
         Gets bill title from congress.gov page.
 
         Example usage:
-            >>> bs = BillSnap('house', 183, 113)
-            >>> print(bs.get_title())
+            >>> bill = SnapScrape('house', 183, 113)
+            >>> print(bill.get_title())
             Veterans Dog Training Therapy Act
         '''
         page_content = BeautifulSoup(
@@ -103,8 +101,8 @@ class BillSnap():
         Gets bill summary from congress.gov page.
 
         Example usage:
-            >>> bs = BillSnap('house', 183, 113)
-            >>> print(b.get_summary())
+            >>> bill = SnapScrape('house', 183, 113)
+            >>> print(bill.get_summary())
             Veterans Dog Training Therapy Act - Directs the Secretary of
             Veterans Affairs to carry out a pilot program for assessing the
             effectiveness of addressing post-deployment mental health and
@@ -128,8 +126,8 @@ class BillSnap():
         policy terms.
 
         Example usage:
-            >>> bs = BillSnap('house', 183, 113)
-            >>> print(bs.get_policy_areas())
+            >>> bill = SnapScrape('house', 183, 113)
+            >>> print(bill.get_policy_areas())
             ['Armed Forces and National Security']
         '''
         policy_vocab = ['Agriculture and Food',
@@ -198,7 +196,7 @@ class BillSnap():
         Gets full text of a bill. Format is readable, but not guaranteed to
         be pretty.
 
-        Returns
+        Returns:
             Full bill text, if available. Returns None if there is no XML/HTML
             link available.
         '''
@@ -221,8 +219,8 @@ class BillSnap():
         Gets the name of a bill's sponsor.
 
         Example usage:
-            >>> bs = BillSnap('house', 183, 113)
-            >>> print(bs.get_sponsor())
+            >>> bill = SnapScrape('house', 183, 113)
+            >>> print(bill.get_sponsor())
             Rep. Grimm, Michael G. [R-NY-11]
         '''
         page_content = BeautifulSoup(
@@ -255,3 +253,16 @@ class BillSnap():
             return cosponsors
         else:
             return [None]
+
+    def get_rollcall(self) -> List:
+
+        actions_url = self.url + '/actions'
+        page_content = BeautifulSoup(
+                requests.get(actions_url).content, 'html.parser'
+            )
+        for link in page_content.find_all('a', href=True):
+            if 'Roll no' in link.text:
+                #reading House votes involves scraping XML
+                print('House Vote')
+            if 'Record Vote' in link.text:
+                print('Senate Vote')
