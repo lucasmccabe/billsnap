@@ -10,28 +10,29 @@ In progress.
 * [License](#license)
 
 ## Setup
-pip later. For now:
+pip later. To get started scraping Congress.gov with `billsnap`:
 
 ```python
-from billsnap import BillSnap
+from billsnap import Scrape
 ```
 
 ## Usage
-Initialize a BillSnap object with:
+To scrape bill contents from Congress.gov, initialize a Scrape object with:
 * chamber label (House or Senate)
 * bill number
 * congressional session (default is 115)
 
 ```python
-bs = BillSnap('House', 183, 113)
+bill = Scrape('House', 183, 113)
 ```
 
 For a given bill, BillSnap can tell you things like:
-* title (`bs.get_title()`)
-* summary (`bs.get_summary()`)
-* policy area(s) (`bs.get_policy_areas()`)
-* full text (`bs.get_text()`)
-* sponsor (`bs.get_sponsor()`)
+* title (`bill.get_title()`)
+* summary (`bill.get_summary()`)
+* policy area(s) (`bill.get_policy_areas()`)
+* full text (`bill.get_text()`)
+* sponsor (`bill.get_sponsor()`)
+* cosponsors (`bill.get_cosponsors()`)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

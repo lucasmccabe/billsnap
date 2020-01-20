@@ -4,7 +4,7 @@ import re
 from typing import List
 
 
-class SnapScrape():
+class Scrape():
     '''Scrapes US legislative data. Is very handsome.'''
 
     def __init__(self, chamber:str, bill:int, congress:int = 115):
@@ -22,7 +22,7 @@ class SnapScrape():
             LookupError: if summary cannot be found on congress.gov page
 
         Example Usage:
-            >>> bill = SnapScrape('house', 183, 113)
+            >>> bill = Scrape('house', 183, 113)
         '''
 
         self.congress = congress
@@ -73,7 +73,7 @@ class SnapScrape():
         Gets bill title from congress.gov page.
 
         Example usage:
-            >>> bill = SnapScrape('house', 183, 113)
+            >>> bill = Scrape('house', 183, 113)
             >>> print(bill.get_title())
             Veterans Dog Training Therapy Act
         '''
@@ -101,7 +101,7 @@ class SnapScrape():
         Gets bill summary from congress.gov page.
 
         Example usage:
-            >>> bill = SnapScrape('house', 183, 113)
+            >>> bill = Scrape('house', 183, 113)
             >>> print(bill.get_summary())
             Veterans Dog Training Therapy Act - Directs the Secretary of
             Veterans Affairs to carry out a pilot program for assessing the
@@ -126,7 +126,7 @@ class SnapScrape():
         policy terms.
 
         Example usage:
-            >>> bill = SnapScrape('house', 183, 113)
+            >>> bill = Scrape('house', 183, 113)
             >>> print(bill.get_policy_areas())
             ['Armed Forces and National Security']
         '''
@@ -219,7 +219,7 @@ class SnapScrape():
         Gets the name of a bill's sponsor.
 
         Example usage:
-            >>> bill = SnapScrape('house', 183, 113)
+            >>> bill = Scrape('house', 183, 113)
             >>> print(bill.get_sponsor())
             Rep. Grimm, Michael G. [R-NY-11]
         '''
