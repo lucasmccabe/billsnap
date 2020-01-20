@@ -26,7 +26,7 @@ To scrape bill contents from Congress.gov, initialize a Scrape object with:
 bill = Scrape('House', 183, 113)
 ```
 
-For a given bill, BillSnap can tell you things like:
+For a given bill, `billsnap` can tell you neat things like:
 * title (`bill.get_title()`)
 * summary (`bill.get_summary()`)
 * policy area(s) (`bill.get_policy_areas()`)
