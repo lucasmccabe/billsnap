@@ -254,6 +254,16 @@ class Scrape():
         else:
             return [None]
 
+    def _get_house_vote(self, link:str) -> List:
+        '''
+        Given a link to a House vote, scrapes XML and returns vote results.
+        '''
+        page_content = BeautifulSoup(
+                requests.get(link).content, 'xml'
+            )
+        return page_content.find_all('recorded-vote')
+
+
     def get_rollcall(self) -> List:
 
         actions_url = self.url + '/actions'
@@ -264,5 +274,9 @@ class Scrape():
             if 'Roll no' in link.text:
                 #reading House votes involves scraping XML
                 print('House Vote')
+                print(link['href'])
+                print(self._get_house_vote(link['href']))
+
             if 'Record Vote' in link.text:
                 print('Senate Vote')
+                print(link['href'])
